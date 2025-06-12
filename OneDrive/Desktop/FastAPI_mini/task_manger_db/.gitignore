@@ -1,0 +1,31 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# System junk
+*.lnk
+*.ini
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+
+# Git credentials
+.git-credentials
+.gitconfig
+
+# Logs and data
+*.log
+*.csv
+*.xlsx
+
+# Ignore folders outside project accidentally picked up
+../../*
