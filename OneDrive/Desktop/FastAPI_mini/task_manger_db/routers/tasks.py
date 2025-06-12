@@ -7,6 +7,9 @@ from schemas import Task as TaskSchema  ## calling class Task in schemas.py
 from models import Task as  TaskModel
 from database import SessionLocal,engine  #import defined in database.py
 from typing import List
+##authetication
+from utils.dependencies import get_current_user
+from models import User
 TaskModel.metadata.create_all(bind=engine)
 router=APIRouter()
 
@@ -20,7 +23,7 @@ def get_db():
 
 # using database
 @router.post('/tasks',response_model=TaskSchema)
-def create_task(task:TaskSchema,db:Session=Depends(get_db)):
+def create_task(task:TaskSchema,db:Session=Depends(get_db),user: User = Depends(get_current_user)):
      ##TaskScema takes input data while depends injects session
     db_task = TaskModel(**task.dict())
     db.add(db_task)
@@ -29,7 +32,7 @@ def create_task(task:TaskSchema,db:Session=Depends(get_db)):
     return db_task
 
 @router.get('/tasks',response_model=List[TaskSchema])  #/taks is url 
-def list_tasks(skip:int=0,limit:int=10, db: Session = Depends(get_db)):
+def list_tasks(skip:int=0,limit:int=10, db: Session = Depends(get_db),user: User = Depends(get_current_user)):
     #  return task_db[skip:skip+limit]
     return db.query(TaskModel).offset(skip).limit(limit).all()
 
@@ -48,7 +51,7 @@ def get_task(task_id:int,db:Session=Depends(get_db)):
 
 
 @router.put('/tasks/{task_id}',response_model=TaskSchema)
-def update_task(task_id:int,updated_task:TaskSchema,db:Session=Depends(get_db)):
+def update_task(task_id:int,updated_task:TaskSchema,db:Session=Depends(get_db),user: User = Depends(get_current_user)):
 
     task = db.query(TaskModel).filter(TaskModel.id == task_id).first()
     if not task:
@@ -66,7 +69,7 @@ def update_task(task_id:int,updated_task:TaskSchema,db:Session=Depends(get_db)):
     raise HTTPException(status_code=404, detail="Task not found")"""
 
 @router.delete('/tasks/{task_id}')
-def delete_task(task_id:int,db:Session=Depends(get_db)):
+def delete_task(task_id:int,db:Session=Depends(get_db),user: User = Depends(get_current_user)):
 
     task = db.query(TaskModel).filter(TaskModel.id == task_id).first()
     if not task:
